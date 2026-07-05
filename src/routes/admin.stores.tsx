@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { StoreDetailDrawer } from "@/components/admin/StoreDetailDrawer";
+import AddStoreWizard from "@/components/admin/AddStoreWizard";
 import { supabase } from "@/integrations/supabase/client";
 import { callEdge } from "@/lib/edge";
 import { bridgeHandshake } from "@/lib/bridge.functions";
@@ -407,7 +408,11 @@ function StoresPage() {
                   <Plus className="mr-2 h-4 w-4" /> Nuovo store
                 </Button>
               </DialogTrigger>
-              <StoreDialog key={editing?.id ?? "new"} store={editing} onSaved={() => { setOpen(false); load(); }} />
+              {editing ? (
+                <StoreDialog key={editing.id} store={editing} onSaved={() => { setOpen(false); load(); }} />
+              ) : (
+                <AddStoreWizard key="new-wizard" onSaved={() => { setOpen(false); load(); }} onCancel={() => setOpen(false)} />
+              )}
             </Dialog>
           </div>
         </div>
