@@ -1,16 +1,18 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "whop-alx-front-002",
+  "name": "whop-seo-front-01",
   "compatibility_date": "2026-06-12",
   "compatibility_flags": ["nodejs_compat"],
   "main": "dist/server/server.js",
   "assets": {
     "directory": "dist/client"
   },
-  "routes": [
-    { "pattern": "oclak.shop", "custom_domain": true }
-  ],
+  "workers_dev": true,
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "SUPABASE_URL": "https://ektdflixvcujykrbqhzs.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrdGRmbGl4dmN1anlrcmJxaHpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyNzc3MzUsImV4cCI6MjA5ODg1MzczNX0.Nz5aAqmcD0FVZ2CoxQdqNQ4RelqRcf70oVjZUkYEI7w"
   }
 }
