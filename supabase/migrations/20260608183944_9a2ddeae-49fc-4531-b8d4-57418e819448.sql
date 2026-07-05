@@ -1,0 +1,1 @@
+ALTER TABLE public.stores ADD COLUMN IF NOT EXISTS product_push_url text;

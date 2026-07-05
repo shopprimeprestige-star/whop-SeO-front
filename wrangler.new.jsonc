@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "whop-alx-front-003",
+  "compatibility_date": "2026-06-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "dist/server/server.js",
+  "assets": {
+    "directory": "dist/client"
+  },
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  }
+}
