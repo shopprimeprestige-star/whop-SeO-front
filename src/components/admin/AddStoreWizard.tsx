@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { bridgeHandshake } from "@/lib/bridge.functions";
 import { Wizard, type WizardStep } from "@/components/admin/Wizard";
-import { Boxes, ShoppingBag, Copy, RefreshCw, KeyRound, AlertTriangle } from "lucide-react";
+import { Boxes, ShoppingBag, Copy, RefreshCw, KeyRound, AlertTriangle, ClipboardPaste } from "lucide-react";
 import { toast } from "sonner";
 
 type IntegrationType = "native_bridge" | "shopify";
@@ -324,37 +324,59 @@ export default function AddStoreWizard({
     },
     {
       title: "URL Sito Ponte",
-      description: "BRIDGE_SITE_URL: l'URL pubblico del Sito Ponte (Sito B).",
+      description: "BRIDGE_SITE_URL: incolla l'URL pubblico del Sito Ponte (Sito B) copiato da lì.",
       valid: bridgeSiteUrl.trim().length > 0,
-      content: ({ next }) => (
-        <LabeledField label="BRIDGE_SITE_URL *">
-          <Input
-            placeholder="whop-seo-back-01.workers.dev"
-            value={bridgeSiteUrl}
-            onChange={(e) => setBridgeSiteUrl(e.target.value)}
-            className="font-mono text-xs"
-          />
-          <div className="mt-2">
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => {
-                let v = bridgeSiteUrl.trim().replace(/\/$/, "");
-                if (v && !/^https?:\/\//i.test(v)) v = `https://${v}`;
-                if (!v) {
-                  toast.error("Inserisci l'URL del Sito Ponte");
-                  return;
-                }
-                setBridgeSiteUrl(v);
-                copy(v, "URL copiato");
-                next();
-              }}
-            >
-              <Copy className="mr-1.5 h-3.5 w-3.5" /> Copia e continua
-            </Button>
-          </div>
-        </LabeledField>
-      ),
+      content: ({ next }) => {
+        const pasteAndAdvance = (raw: string) => {
+          let v = raw.trim().replace(/\/$/, "");
+          if (!v) {
+            toast.error("URL vuoto");
+            return;
+          }
+          if (!/^https?:\/\//i.test(v)) v = `https://${v}`;
+          setBridgeSiteUrl(v);
+          setTimeout(next, 80);
+        };
+        return (
+          <LabeledField label="BRIDGE_SITE_URL *">
+            <div className="flex gap-2">
+              <Input
+                placeholder="https://whop-seo-back-01.workers.dev"
+                value={bridgeSiteUrl}
+                onChange={(e) => setBridgeSiteUrl(e.target.value)}
+                onPaste={(e) => {
+                  const t = e.clipboardData.getData("text").trim();
+                  if (t) {
+                    e.preventDefault();
+                    pasteAndAdvance(t);
+                  }
+                }}
+                className="font-mono text-xs"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="shrink-0"
+                onClick={async () => {
+                  try {
+                    const t = (await navigator.clipboard.readText()).trim();
+                    if (!t) {
+                      toast.error("Appunti vuoti");
+                      return;
+                    }
+                    pasteAndAdvance(t);
+                  } catch {
+                    toast.error("Impossibile leggere gli appunti — incolla nel campo");
+                  }
+                }}
+              >
+                <ClipboardPaste className="mr-1.5 h-3.5 w-3.5" /> Incolla e continua
+              </Button>
+            </div>
+          </LabeledField>
+        );
+      },
     },
     {
       title: "Bridge API Key",
