@@ -1,0 +1,37 @@
+name: Deploy front (whop-seo-front-01)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-front
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install deps
+        run: bun install
+      - name: Write build-time env (.env is gitignored; these values are public anon/publishable + admin email)
+        run: |
+          cat > .env <<'ENV'
+          SUPABASE_URL="https://ektdflixvcujykrbqhzs.supabase.co"
+          SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrdGRmbGl4dmN1anlrcmJxaHpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyNzc3MzUsImV4cCI6MjA5ODg1MzczNX0.Nz5aAqmcD0FVZ2CoxQdqNQ4RelqRcf70oVjZUkYEI7w"
+          VITE_SUPABASE_URL="https://ektdflixvcujykrbqhzs.supabase.co"
+          VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrdGRmbGl4dmN1anlrcmJxaHpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyNzc3MzUsImV4cCI6MjA5ODg1MzczNX0.Nz5aAqmcD0FVZ2CoxQdqNQ4RelqRcf70oVjZUkYEI7w"
+          VITE_ADMIN_EMAIL="shop.primeprestige@gmail.com"
+          ENV
+      - name: Build
+        run: bun run build
+      - name: Deploy
+        run: bunx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: c147977feff61a28aa9ecada1bf5e36b
